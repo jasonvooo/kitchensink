@@ -9,10 +9,16 @@
         <module name="kitchensink" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="kitchensink.main" target="17" />
+      <module name="kitchensink.test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="kitchensink" options="-Xlint:unchecked" />
+      <module name="kitchensink" options="" />
+      <module name="kitchensink.main" options="-Xlint:unchecked" />
+      <module name="kitchensink.test" options="-Xlint:unchecked" />
     </option>
   </component>
 </project>
