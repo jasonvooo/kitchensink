@@ -23,7 +23,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
-import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -46,9 +45,6 @@ import java.util.Set;
 public class MemberResource {
 
     private static final Logger LOG = Logger.getLogger(MemberService.class);
-
-    @Inject
-    Validator validator;
 
     @Inject
     MemberService memberService;

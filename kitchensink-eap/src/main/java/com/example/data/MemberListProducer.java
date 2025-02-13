@@ -27,7 +27,6 @@ import jakarta.inject.Named;
 
 import java.util.List;
 
-
 @RequestScoped
 public class MemberListProducer {
 
