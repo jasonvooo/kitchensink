@@ -1,7 +1,7 @@
 package org.example.controller;
 
-import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.containsString;
 
 @QuarkusTest
+@Transactional
 public class MemberControllerTest {
 
     @Test
@@ -26,7 +27,6 @@ public class MemberControllerTest {
     }
 
     @Test
-    @TestTransaction
     public void testValidFormSubmission() {
         // Create form data
         Map<String, String> formParams = new HashMap<>();
@@ -52,7 +52,6 @@ public class MemberControllerTest {
     }
 
     @Test
-    @TestTransaction
     public void testInvalidFormSubmission() {
         Map<String, String> formParams = new HashMap<>();
         formParams.put("name", "John123");  // Invalid name with numbers

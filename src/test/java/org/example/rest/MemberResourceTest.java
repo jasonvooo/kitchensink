@@ -1,8 +1,8 @@
 package org.example.rest;
 
-import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -14,10 +14,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @QuarkusTest
+@Transactional
 public class MemberResourceTest {
 
     @Test
-    @TestTransaction
     public void testCreateMember() {
         // Create a new member
         given()
@@ -25,7 +25,7 @@ public class MemberResourceTest {
                 .body("""
                         {
                             "name": "John Doe",
-                            "email": "john@example.com",
+                            "email": "john1@example.com",
                             "phoneNumber": "1234567890"
                         }
                         """)
@@ -35,7 +35,7 @@ public class MemberResourceTest {
                 .statusCode(201)
                 .body("id", is(notNullValue()))
                 .body("name", equalTo("John Doe"))
-                .body("email", equalTo("john@example.com"));
+                .body("email", equalTo("john1@example.com"));
 
         // Verify the member exists in the list
         given()
@@ -47,7 +47,6 @@ public class MemberResourceTest {
     }
 
     @Test
-    @TestTransaction
     public void testInvalidMemberData() {
         given()
                 .contentType(ContentType.JSON)
@@ -73,7 +72,6 @@ public class MemberResourceTest {
     }
 
     @Test
-    @TestTransaction
     public void testGetMember() {
         // First create a member
         String id = given()
