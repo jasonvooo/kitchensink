@@ -16,6 +16,7 @@
  */
 package com.example.test;
 
+import com.example.model.Member;
 import com.example.service.MemberRegistration;
 import com.example.util.Resources;
 import jakarta.inject.Inject;
