@@ -21,13 +21,19 @@ import com.example.repository.MemberRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @ApplicationScoped
 public class MemberService {
+
+    @Inject
+    Validator validator;
 
     @Inject
     MemberRepository memberRepository;
@@ -37,6 +43,12 @@ public class MemberService {
         if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
             throw new ValidationException("Email already exists");
         }
+
+        final Set<ConstraintViolation<Member>> violations = validator.validate(member);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
         memberRepository.persist(member);
     }
 
@@ -44,11 +56,7 @@ public class MemberService {
         return memberRepository.findAllOrderedByName();
     }
 
-    public Optional<Member> findById(long id) {
+    public Member findById(String id) {
         return memberRepository.findById(id);
-    }
-
-    public Optional<Member> findByEmail(String email) {
-        return memberRepository.findByEmail(email);
     }
 }
