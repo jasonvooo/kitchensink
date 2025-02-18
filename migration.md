@@ -1,130 +1,167 @@
-# Kitchen Sink Path to Modernisation
+# Kitchen Sink Path to Modernization
 
 ## Kitchen Sink Requirements
 
 ### UI
 
-- Ability to register name, email and phone number
-    - Field level validations for name, email and phone
+- Ability to register name, email, and phone number
+    - Field-level validations for name, email, and phone
     - Unique constraint on email
-- List members on the UI
+- Display a list of registered members on the UI
 
 ### API
 
-- API POST Register Member with validation
-- API GET Member List
-- API GET Member by ID
+- **POST /members** - Register a new member with validation
+- **GET /members** - Retrieve a list of members
+- **GET /members/{id}** - Retrieve a member by ID
 
 ### Infrastructure
 
 - Deploy onto OpenShift
-- Integration tests which run against deployed server
+- Run integration tests against the deployed server
 
 ### Technical Stack
 
-JBoss EAP 8.0 - JSF, CDI, JAX-RS, EJB, JPA, and Bean Validation
+- **Current Stack**: JBoss EAP 8.0 with JSF, CDI, JAX-RS, EJB, JPA, and Bean Validation
 
-## Process of Migration
+## Migration Process
 
-### Tools used
+### Assumptions
 
-- gpt-4o
-- claude-3.5-sonnet
-- Redhat MTA
-    - Couldn't actually get this running but the tool looks to be useful to analysis of Java applications and had
-      support
-      for JBoss 8 to Quarkus migration
+- The modernization will occur **within the existing repository**, and developers will iteratively migrate services to
+  Quarkus.
+- The embedded **H2 database** is used for development, but the assumption is that a deployed database will be shared by
+  both Quarkus and JBoss EAP during migration.
+- The application must **remain functional** throughout the migration.
+
+### Tools Used
+
+- **Cursor** - **gpt-4o** & **claude-3.5-sonnet**
+    - Used extensively to assist with code translation, template conversion (e.g., JSF to Qute), and generation of
+      migration strategies.
+    - Enabled faster discovery of library equivalents and coding patterns, reducing manual lookup times.
 
 ### Library Evaluation
 
-Evaluation was done to compare Quarkus and Spring Boot as target frameworks
-for the migration. The libraries were evaluated before:
+A comparison was performed between Quarkus and Spring Boot to determine the best target framework for migration. The
+evaluation considered the existing Java EE components and their equivalents in both frameworks:
 
-| JBoss EE Component | Quarkus Migration | Spring Boot Migration |
-|--------------------|-------------------|-----------------------|
-| JSF                | Qute              | Thymeleaf             |
-| CDI                | Keep CDI          | Switch to Spring DI   |
-| JPA                | Keep JPA          | Spring Data JPA       |
-| JAX-RS             | REST              | Spring MVC/WebFlux    |
-| Bean Validation    | Keep Bean Valid.  | Spring Validation     |
-| EJB                | CDI Beans         | Spring Components     |
+| JBoss EAP Component | Quarkus Migration    | Spring Boot Migration |
+|---------------------|----------------------|-----------------------|
+| JSF                 | Qute                 | Thymeleaf             |
+| CDI                 | Keep CDI             | Switch to Spring DI   |
+| JPA                 | Keep JPA             | Spring Data JPA       |
+| JAX-RS              | RESTEasy             | Spring MVC/WebFlux    |
+| Bean Validation     | Keep Bean Validation | Spring Validation     |
+| EJB                 | CDI Beans            | Spring Components     |
 
-After evaluation from online resources I made the choice to go with Quarkus as it follows Jakarta EE conventions
-and has similar libraries which can be a drop in replacement. Although the spring library ecosystem
-is larger, my assessment here is that if the developers are used to writing in Jakarta EE it will be an easier shift
-to start using Quarkus.
+After evaluating online resources, Quarkus was chosen as the target framework. This decision was based on Quarkus'
+adherence to **Jakarta EE conventions**, making it a smoother transition for developers already familiar with Java EE.
+While Spring Boot offers a larger library ecosystem, Quarkus provides more **drop-in replacements** for Java EE
+components.
 
-### Migration deployment
+## Deployment Strategy
+
+### Incremental Migration Plan
 
 ```mermaid
 graph LR
 ;
     A[Client / API] --> B[EAP Server]
     B[EAP Server] -->|Proxy| C[Quarkus Service]
-    B[EAP Server] --> D[DB]
-    C[Quarkus Service] --> D[DB]
+    B[EAP Server] --> D[Database]
+    C[Quarkus Service] --> D[Database]
 ```
 
-To make this an iterative approach the plan is to develop and deploy the quarkus service which will run in parallel to
-the JBoss application while the migration is done. Quarkus service will start to reimplement the existing APIs which
-then the JBoss Server will proxy the requests.
+To facilitate an **incremental migration**, the Quarkus service will be developed and deployed alongside the existing
+JBoss EAP application. The JBoss EAP server will proxy API requests to the new Quarkus service as each component is
+migrated.
 
-### Alternative approaches
+### Alternative Approaches
 
-- Instead of a proxy this could've also been achieved using an API gateway which would forward the migrated API requests
-  to the new service. Decision was made to go with the proxy because it could be implemented in this exercise without
-  other cloud considerations.
+- Instead of using a **proxy**, an API Gateway (e.g., Kong, NGINX, Istio) could forward requests to the new Quarkus
+  service.
+- The proxy approach was chosen for this exercise to minimize infrastructure complexity and avoid additional cloud
+  dependencies.
 
-## Process of Migration
+## Migration Process
 
-### Assumptions Made
+### Steps to Modernization
 
-- Code modernisation will happen in the current repository and developers will iteratively migrate to Quarkus
-- For this example the embedded h2 db is used, assume there is some deployed DB which both Quarkus service and Jboss EAP
-  will connect to and for the duration of the migration the same DB is used.
-- Assumption is that during the migration the application is expected to remain in a working state.
-
-### Steps to Modernisation
-
-1. Break down the project into submodules Introduce Quarkus Dependencies and update to use Java 17
+#### 1. Introduce a Multi-Module Structure & Upgrade to Java 17
 
 ```
 kitchensink/
 ├── kitchensink-eap/     # JBoss EAP module
 ├── kitchensink-quarkus/ # Quarkus module
-└── kitchensink-model/  # Shared code
+└── kitchensink-model/   # Shared model and utilities
 ```
 
-Assumption here is that using maven we can easily package each application and deploy it onto openshift.
+- This structure allows parallel development and ensures that common models remain accessible to both applications.
+- Maven is used to package and deploy both applications onto OpenShift.
 
-2. Start by updating one API resource at a time migrating over
+#### 2. Incrementally Migrate API Endpoints
 
-For this example there is only one resource but the migration was done in a way such that if there were several APIs
-they could be migrated iteratively. The proxying is done inside
-[Quarkus Proxy Filter](kitchensink-eap/src/main/java/com/example/proxy/QuarkusProxyFilter.java) which forwards the
-requests.
-For the purpose of the exercise this is a very basic implementation.
+- Migrate **one API resource at a time** to the Quarkus service.
+- A **Quarkus Proxy Filter** (`QuarkusProxyFilter.java`) inside the JBoss EAP application forwards API requests to
+  Quarkus.
+- Unit tests and integration tests are written alongside the migration.
+- Dependency Injection:
+    - JBoss EAP: Utilized @Inject from javax.inject.
+    - Quarkus: Continues to use @Inject, but also leverages additional Quarkus features.
+- Path Annotations:
+    - JBoss EAP: Typically used @Path from javax.ws.rs.
+    - Quarkus: Uses @Path from jakarta.ws.rs, reflecting the shift to Jakarta EE namespaces.
+- Validation Annotations:
+    - JBoss EAP: Used @NotNull, @NotEmpty, and @Digits from javax.validation.constraints.
+    - Quarkus: Updated to use @NotBlank, @Email, and @Size from jakarta.validation.constraints, simplifying
+      validation
+      logic
+      and improving clarity.
+- Transactional Annotations:
+    - JBoss EAP: Used @Transactional from javax.transaction.
+    - Quarkus: Continues to use @Transactional, but with improved integration in the Quarkus ecosystem.
+- Service Annotations:
+    - JBoss EAP: Used @Stateless for EJBs.
+    - Quarkus: Transitioned to @ApplicationScoped for CDI beans, simplifying the component model.
 
-As the APIs were migrated over unit tests and integration tests were written.
+#### 3. Migrate the UI
 
-3. Migrate UI
+- The **JSF UI** is replaced with **Qute**, Quarkus’ templating engine, to maintain server-side rendering.
+- The HTML templates were translated into Qute templates using **Claude**.
 
-To not overcomplicate things I have gone with Quarkus Qute as the templating engine and kept the UI as a server rendered
-template. The html template was translated over the Qute template format using claude.
+#### 4. Remove JBoss Dependency & Upgrade to Java 21
 
-4. Remove JBoss dependency & Java 21
+- Once all APIs and UI components are migrated, **the JBoss EAP module is removed**.
+- The **models are merged into the Quarkus project**.
+- The application is updated to **Java 21** to leverage newer features and optimizations.
 
-Since this was the last remaining piece we can now consolidate down the modules and remove the `kitchesink-eap` module
-and move the models into the `kitchensink-quarkus` project. Once migrated I can now update the Java version to 21
+#### 5. Migrate to MongoDB
 
-5. Migrate to MongoDB
+- The **relational database is replaced with MongoDB**, updating the repository layer to use **Panache MongoDB**.
+- A **data migration** using Relational Migrator is performed and assumed to be working.
+- The new Quarkus application is deployed with MongoDB as the primary data source.
 
-This was done as a last step to first modernise and then migrate to MongoDB, I have updated the repository layer and
-assumption here is for the switch over there was allowed downtime so a snapshot migration is sufficient and the mongodb
-version of the app can be deployed
+### Key Findings & Lessons Learned
 
-### Findings / Notes
+- AI Acceleration: Significant time savings in both code refactoring and documentation.
+- **Introducing Quarkus dependencies into the existing JBoss EAP application was impractical** due to version conflicts
+  and dependency mismatches.
+- **Proxying through JBoss EAP was an effective interim solution**, allowing gradual migration without disrupting the
+  application.
+- **An API Gateway could have been a more scalable alternative**, but it was not necessary for this specific exercise.
+- **Qute was a simple and effective replacement for JSF**, making the UI migration relatively straightforward.
+- **RedHat Migration Toolkit for Applications (MTA)**
+    - Could not successfully run MTA, but it appeared to be a useful tool for analyzing Java applications and supporting
+      JBoss EAP 8 to Quarkus migration.
 
-- Initial attempted was to see if quarkus dependency could be introduced and run in the same executable but quickly
-  decided that would be too messy and there were version conflicts with the underlying dependencies
+## Conclusion
+
+The migration from **JBoss EAP to Quarkus** was achieved through an **incremental, low-risk approach** by running the
+applications side-by-side and proxying requests. This method allowed for:
+
+- **Minimal downtime**
+- **Gradual API and UI transition**
+- **Seamless database integration**
+
 

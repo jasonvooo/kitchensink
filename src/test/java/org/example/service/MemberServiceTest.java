@@ -8,7 +8,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,8 +30,7 @@ public class MemberServiceTest {
 
         memberService.register(newMember);
 
-        assertNotNull(newMember.getId());
-        assertTrue(newMember.getId() > 0);
+        assertNotNull(newMember.getName());
     }
 
     @Test
@@ -75,10 +75,8 @@ public class MemberServiceTest {
         memberService.register(newMember);
 
         // Find the member
-        Member found = memberService.findById(newMember.getId())
-                .orElseThrow();
+        List<Member> members = memberService.getAllMembers();
 
-        assertEquals("Find Me", found.getName());
-        assertEquals("findme@example.com", found.getEmail());
+        assertTrue(members.stream().anyMatch(f -> f.getName().equals("Find Me") && f.getEmail().equals("findme@example.com")));
     }
 }

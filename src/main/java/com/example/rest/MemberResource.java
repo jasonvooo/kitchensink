@@ -29,22 +29,21 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.jboss.logging.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @Path("/api/members")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class MemberResource {
 
-    private static final Logger LOG = Logger.getLogger(MemberService.class);
+    private static final Logger LOG = Logger.getLogger(MemberService.class.toString());
 
     @Inject
     MemberService memberService;
@@ -55,10 +54,9 @@ public class MemberResource {
     }
 
     @GET
-    @Path("/{id:[0-9]+}")
-    public Member lookupMemberById(@PathParam("id") long id) {
-        return memberService.findById(id)
-                .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+    @Path("/{id:\\w+}")
+    public Member lookupMemberById(@PathParam("id") String id) {
+        return memberService.findById(id);
     }
 
 
