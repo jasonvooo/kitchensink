@@ -2,35 +2,20 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.example</groupId>
-    <artifactId>kitchensink-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <name>Kitchensink Parent</name>
-
-    <modules>
-        <module>kitchensink-model</module>
-        <module>kitchensink-eap</module>
-        <module>kitchensink-quarkus</module>
-    </modules>
+    <groupId>org.example</groupId>
+    <version>1.0.0</version>
+    <artifactId>kitchensink</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.version>3.18.2</quarkus.platform.version>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
-        <jakarta.persistence.version>3.1.0</jakarta.persistence.version>
-        <jakarta.validation.version>3.0.2</jakarta.validation.version>
-        <jakarta.ejb.version>4.0.1</jakarta.ejb.version>
-        <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Quarkus BOM -->
             <dependency>
                 <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-bom</artifactId>
@@ -38,102 +23,67 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!-- Jakarta Dependencies -->
-            <dependency>
-                <groupId>jakarta.persistence</groupId>
-                <artifactId>jakarta.persistence-api</artifactId>
-                <version>${jakarta.persistence.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>${jakarta.validation.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ejb</groupId>
-                <artifactId>jakarta.ejb-api</artifactId>
-                <version>${jakarta.ejb.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ejb</groupId>
-                <artifactId>jakarta.ejb-api</artifactId>
-                <version>${jakarta.ejb.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${jakarta.servlet.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
+        <!-- Core dependencies -->
         <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.transaction</groupId>
-            <artifactId>jakarta.transaction-api</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm-panache</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus.qute</groupId>
-            <artifactId>qute-core</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
+        <!-- Database -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
+        </dependency>
+
+        <!-- Web UI -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-qute</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jakarta.ejb</groupId>
-            <artifactId>jakarta.ejb-api</artifactId>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <!--    <repositories>-->
-    <!--        &lt;!&ndash; Maven Central &ndash;&gt;-->
-    <!--        <repository>-->
-    <!--            <id>central</id>-->
-    <!--            <name>Maven Central</name>-->
-    <!--            <url>https://repo.maven.apache.org/maven2</url>-->
-    <!--        </repository>-->
-    <!--        &lt;!&ndash; JBoss/Red Hat Repositories &ndash;&gt;-->
-    <!--        <repository>-->
-    <!--            <id>jboss-public-maven-repository</id>-->
-    <!--            <name>JBoss Public Maven Repository</name>-->
-    <!--            <url>https://repository.jboss.org/nexus/content/groups/public/</url>-->
-    <!--        </repository>-->
-    <!--        <repository>-->
-    <!--            <id>redhat-ga-maven-repository</id>-->
-    <!--            <name>Red Hat GA Maven Repository</name>-->
-    <!--            <url>https://maven.repository.redhat.com/ga/</url>-->
-    <!--        </repository>-->
-    <!--    </repositories>-->
-
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

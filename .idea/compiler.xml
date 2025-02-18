@@ -6,16 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="kitchensink-quarkus" />
-        <module name="kitchensink-eap" />
-        <module name="kitchensink-model" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="kitchensink" options="" />
-      <module name="kitchensink-eap" options="-Xlint:unchecked" />
     </option>
   </component>
 </project>
