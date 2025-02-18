@@ -11,19 +11,6 @@
 
     <artifactId>kitchensink-quarkus</artifactId>
 
-    <!--    <dependencyManagement>-->
-    <!--        <dependencies>-->
-    <!--            &lt;!&ndash; Quarkus BOM &ndash;&gt;-->
-    <!--            <dependency>-->
-    <!--                <groupId>io.quarkus.platform</groupId>-->
-    <!--                <artifactId>quarkus-bom</artifactId>-->
-    <!--                <version>${quarkus.platform.version}</version>-->
-    <!--                <type>pom</type>-->
-    <!--                <scope>import</scope>-->
-    <!--            </dependency>-->
-    <!--        </dependencies>-->
-    <!--    </dependencyManagement>-->
-
     <dependencies>
         <!-- Shared Model -->
         <dependency>

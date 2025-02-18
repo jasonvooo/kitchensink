@@ -14,41 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.data;
+package com.example.service;
 
 import com.example.model.Member;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.event.Reception;
-import jakarta.enterprise.inject.Produces;
+import com.example.repository.MemberRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import jakarta.transaction.Transactional;
+import jakarta.validation.ValidationException;
 
 import java.util.List;
+import java.util.Optional;
 
-@RequestScoped
-public class MemberListProducer {
+@ApplicationScoped
+public class MemberService {
 
     @Inject
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
 
-    private List<Member> members;
-
-    // @Named provides access the return value via the EL variable name "members" in the UI (e.g.
-    // Facelets or JSP view)
-    @Produces
-    @Named
-    public List<Member> getMembers() {
-        return members;
+    @Transactional
+    public void register(Member member) {
+        if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
+            throw new ValidationException("Email already exists");
+        }
+        memberRepository.persist(member);
     }
 
-    public void onMemberListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Member member) {
-        retrieveAllMembersOrderedByName();
+    public List<Member> getAllMembers() {
+        return memberRepository.findAllOrderedByName();
     }
 
-    @PostConstruct
-    public void retrieveAllMembersOrderedByName() {
-        members = memberRepository.findAllOrderedByName();
+    public Optional<Member> findById(long id) {
+        return memberRepository.findById(id);
+    }
+
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 }
