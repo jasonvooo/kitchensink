@@ -1,0 +1,116 @@
+{#include base}
+    {#content}
+        <h1>Welcome to JBoss!</h1>
+
+        <div>
+            <p>You have successfully deployed a Jakarta EE Enterprise Application.</p>
+        </div>
+
+        <form id="reg" action="" method="post">
+            <h2>Member Registration</h2>
+            <p>Enforces annotation-based constraints defined on the model class.</p>
+
+            <!-- h:panelGrid columns="3" columnClasses="titleCell" equivalent -->
+            <div style="display: grid; grid-template-columns: auto 1fr 80px; gap: 10px; margin-bottom: 20px;">
+                <!-- Name Row -->
+                <div style="text-align: right; padding-right: 10px;">
+                    <label for="name">Name:</label>
+                </div>
+                <div>
+                    <input type="text" id="name" name="name"
+                           value="{formData.name ?: ''}"
+                           style="width: 100%; padding: 4px;"
+                           class="{#if errors.name??}invalid{/if}"/>
+                </div>
+                <div>
+                    {#if errors.name??}<span class="invalid">{errors.name}</span>{/if}
+                </div>
+
+                <!-- Email Row -->
+                <div style="text-align: right; padding-right: 10px;">
+                    <label for="email">Email:</label>
+                </div>
+                <div>
+                    <input type="email" id="email" name="email"
+                           value="{formData.email ?: ''}"
+                           style="width: 100%; padding: 4px;"
+                           class="{#if errors.email??}invalid{/if}"/>
+                </div>
+                <div>
+                    {#if errors.email??}<span class="invalid">{errors.email}</span>{/if}
+                </div>
+
+                <!-- Phone Number Row -->
+                <div style="text-align: right; padding-right: 10px;">
+                    <label for="phoneNumber">Phone #:</label>
+                </div>
+                <div>
+                    <input type="tel" id="phoneNumber" name="phoneNumber"
+                           value="{formData.phoneNumber ?: ''}"
+                           style="width: 100%; padding: 4px;"
+                           class="{#if errors.phoneNumber??}invalid{/if}"/>
+                </div>
+                <div>
+                    {#if errors.phoneNumber??}<span class="invalid">{errors.phoneNumber}</span>{/if}
+                </div>
+            </div>
+
+            <!-- Register Button and Messages -->
+            <div style="margin-top: 20px;">
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center;">
+                    <input type="submit" id="register" value="Register"
+                           style="padding: 5px 15px;" class="register"/>
+                    {#if errors.globalError??}
+                        <span class="invalid" style="margin-left: 10px;">{errors.globalError}</span>
+                    {/if}
+                    {#if success??}
+                        <span style="margin-left: 10px;">Registered!</span>
+                    {/if}
+                </div>
+            </div>
+        </form>
+
+        <h2>Members</h2>
+        <!-- h:panelGroup rendered equivalent -->
+        {#if members.isEmpty}
+            <div style="margin: 10px 0;">
+                <em>No registered members.</em>
+            </div>
+        {#else}
+            <table class="simpletablestyle">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone #</th>
+                    <th>REST URL</th>
+                </tr>
+                </thead>
+                <tbody>
+                {#for member in members}
+                    <tr>
+                        <td>{member.id}</td>
+                        <td>{member.name}</td>
+                        <td>{member.email}</td>
+                        <td>{member.phoneNumber}</td>
+                        <td>
+                            <a href="/api/members/{member.id}">
+                                /api/members/{member.id}
+                            </a>
+                        </td>
+                    </tr>
+                {/for}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        REST URL for all members:
+                        <a href="/api/members">/api/members</a>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        {/if}
+    {/content}
+{/include}
